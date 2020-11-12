@@ -215,9 +215,8 @@ Stddev(struct dataset *ds)
 static void
 TimePrint(void)
 {
-	printf("Timing Performance 		AddPoint 	ReadSet		... 	\n");
-	printf("This Week:       %llu       %llu", ts[0], ts[1]);
-	printf("\n");
+	printf("Timing Performance 		AddPoint 	    ReadSet		... 	\n");
+	printf("This Week:              %llu            %llu\n", ts[0], ts[1]);
 }
 
 static void
@@ -608,7 +607,7 @@ main(int argc, char **argv)
 				usage("Unable to move beyond left margin.");
 			break;
         case 'v':
-            if (optopt != NULL)
+            if (*optarg != '\0')
                 usage("No option argument required.");
             flag_v = 1;
             break;
@@ -649,6 +648,10 @@ main(int argc, char **argv)
 		Vitals(ds[i], i + 1);
 		if (!flag_n)
 			Relative(ds[i], ds[0], ci);
+	}
+
+    if(flag_v) {
+		TimePrint();
 	}
 	exit(0);
 }
