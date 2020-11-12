@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include "queue.h"
 
@@ -127,6 +128,8 @@ double student [NSTUDENT + 1][NCONF] = {
 
 #define	MAX_DS	8
 static char symbol[MAX_DS] = { ' ', 'x', '+', '*', '%', '#', '@', 'O' };
+static unsigned long long int ts[2];
+struct timespec start, stop;
 
 struct dataset {
 	char *name;
@@ -155,8 +158,11 @@ AddPoint(struct dataset *ds, double a)
 	if (ds->n >= ds->lpoints) {
 		dp = ds->points;
 		ds->lpoints *= 4;
+		clock_gettime(CLOCK_MONOTONIC, &start);
 		ds->points = calloc(sizeof *ds->points, ds->lpoints);
 		memcpy(ds->points, dp, sizeof *dp * ds->n);
+		clock_gettime(CLOCK_MONOTONIC, &stop);
+		ts[0] = elapsed_us(&start, &stop);
 		free(dp);
 	}
 	ds->points[ds->n++] = a;
@@ -207,9 +213,11 @@ Stddev(struct dataset *ds)
 }
 
 static void
-TimeHead(void)
+TimePrint(void)
 {
-	printf("Timing Performance 		Week 1		Week 2		Week 3		Week 4		Week 5\n");
+	printf("Timing Performance 		AddPoint 	ReadSet		... 	\n");
+	printf("This Week:       %llu       %llu", ts[0], ts[1]);
+	printf("\n");
 }
 
 static void
@@ -453,6 +461,7 @@ dbl_cmp(const void *a, const void *b)
 static struct dataset *
 ReadSet(const char *n, int column, const char *delim)
 {
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	FILE *f;
 	char buf[BUFSIZ], *p, *t;
 	struct dataset *s;
@@ -502,6 +511,8 @@ ReadSet(const char *n, int column, const char *delim)
 		exit (2);
 	}
 	qsort(s->points, s->n, sizeof *s->points, dbl_cmp);
+	clock_gettime(CLOCK_MONOTONIC, &stop);
+	ts[1] = elapsed_us(&start, &stop);
 	return (s);
 }
 
