@@ -207,6 +207,12 @@ Stddev(struct dataset *ds)
 }
 
 static void
+TimeHead(void)
+{
+	printf("Timing Performance 		Week 1		Week 2		Week 3		Week 4		Week 5\n");
+}
+
+static void
 VitalsHead(void)
 {
 
